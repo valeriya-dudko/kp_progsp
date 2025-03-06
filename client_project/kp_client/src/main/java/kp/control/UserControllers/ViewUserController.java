@@ -1,0 +1,76 @@
+package kp.control.UserControllers;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import kp.Client;
+import kp.MainMenuClient;
+import kp.model.*;
+
+public class ViewUserController {
+    private Client client;
+    private Stage stage;
+
+    public void setClient(Client client)
+    {
+        this.client = client;
+    }
+    public void setStage(Stage stage)
+    {
+        this.stage = stage;
+    }
+
+    @FXML
+    private TableView<User> userTable;
+
+    @FXML
+    private TableColumn<User, Long> idCol;
+    @FXML
+    private TableColumn<User, String> loginCol;
+    @FXML
+    private TableColumn<User, String> roleCol;
+
+    @FXML
+    public void handleBackButton(ActionEvent event) throws Exception
+    {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainMenuClient.class.getResource("/main_hadmin.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setScene(scene);
+
+        MainHadminController mhaController = fxmlLoader.getController();
+        mhaController.setClient(client);
+        mhaController.setStage(stage);
+    }
+
+    public void initialize()
+    {
+        idCol.setCellValueFactory(new PropertyValueFactory<User, Long>("id"));
+        loginCol.setCellValueFactory(new PropertyValueFactory<User, String>("login"));
+        roleCol.setCellValueFactory( cellData -> {
+                    int role = cellData.getValue().getRole();
+                    String roleAsString;
+                    if(role == 1)
+                    {
+                        roleAsString = "старший администратор";
+                    }
+                    else if(role == 2)
+                    {
+                        roleAsString = "администратор";
+                    }
+                    else
+                    {
+                        roleAsString = "пользователь";
+                    }
+
+                    return new ReadOnlyStringWrapper(roleAsString);
+                }
+        );
+
+        userTable.getItems().setAll(MainHadminController.users);
+    }
+}
